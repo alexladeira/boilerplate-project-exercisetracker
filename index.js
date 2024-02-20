@@ -36,6 +36,27 @@ app
     return res.json({ _id: user._id, username: user.username });
   });
 
+app.post("/api/users/:_id/exercises", async (req, res) => {
+  const description = req.body.description;
+  const duration = req.body.duration;
+  let date = req.body.date;
+
+  if (date === undefined) {
+    date = new Date();
+  }
+  let user = await User.findById(req.params._id);
+  user.exercises.push({ description, duration, date });
+  await user.save();
+
+  return res.json({
+    username: user.username,
+    description,
+    duration,
+    date: date.toDateString(),
+    _id: user._id,
+  });
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
