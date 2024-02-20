@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 const userSchema = new mongoose.Schema({
   username: String,
-  exercises: [{ description: String, duration: String, date: Date }],
+  exercises: [{ description: String, duration: Number, date: Date }],
 });
 const User = mongoose.model("User", userSchema);
 
@@ -38,7 +38,7 @@ app
 
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const description = req.body.description;
-  const duration = req.body.duration;
+  const duration = parseInt(req.body.duration);
   let date = req.body.date;
 
   if (date === undefined) {
