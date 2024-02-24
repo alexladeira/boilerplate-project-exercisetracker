@@ -57,6 +57,38 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
   });
 });
 
+app.get("/api/users/:_id/logs", async (req, res) => {
+  const { from, to, limit } = req.query;
+
+  let pipeline = [
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.params._id),
+        $and: [
+          from ? { "exercises.date": { $gte: from } } : {},
+          to ? { "exercises.date": { $lte: to } } : {},
+        ],
+      },
+    },
+    {
+      $project: {
+        username: 1,
+        count: { $size: "$exercises" },
+        log: {
+          $slice: ["$exercises", parseInt(limit)],
+        },
+      },
+    },
+    { $unset: "log._id" },
+  ];
+
+  let user = await User.aggregate(pipeline);
+  user[0].log.forEach(
+    (entry) => (entry.date = new Date(entry.date).toDateString())
+  );
+  return res.json(user[0]);
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
