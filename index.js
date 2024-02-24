@@ -39,11 +39,8 @@ app
 app.post("/api/users/:_id/exercises", async (req, res) => {
   const description = req.body.description;
   const duration = parseInt(req.body.duration);
-  let date = req.body.date;
+  let date = req.body.date === undefined ? new Date() : new Date(req.body.date);
 
-  if (date === undefined) {
-    date = new Date();
-  }
   let user = await User.findById(req.params._id);
   user.exercises.push({ description, duration, date });
   await user.save();
