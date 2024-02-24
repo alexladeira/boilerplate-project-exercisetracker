@@ -57,6 +57,8 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 app.get("/api/users/:_id/logs", async (req, res) => {
   const { from, to, limit } = req.query;
 
+  console.log(limit);
+
   let pipeline = [
     {
       $match: {
@@ -71,9 +73,11 @@ app.get("/api/users/:_id/logs", async (req, res) => {
       $project: {
         username: 1,
         count: { $size: "$exercises" },
-        log: {
-          $slice: ["$exercises", parseInt(limit)],
-        },
+        log: limit
+          ? {
+              $slice: ["$exercises", parseInt(limit)],
+            }
+          : "$exercises",
       },
     },
     { $unset: "log._id" },
