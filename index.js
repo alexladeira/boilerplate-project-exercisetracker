@@ -57,15 +57,13 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
 app.get("/api/users/:_id/logs", async (req, res) => {
   const { from, to, limit } = req.query;
 
-  console.log(limit);
-
   let pipeline = [
     {
       $match: {
         _id: new mongoose.Types.ObjectId(req.params._id),
         $and: [
-          from ? { "exercises.date": { $gte: from } } : {},
-          to ? { "exercises.date": { $lte: to } } : {},
+          from ? { "exercises.date": { $gte: new Date(from) } } : {},
+          to ? { "exercises.date": { $lte: new Date(to) } } : {},
         ],
       },
     },
